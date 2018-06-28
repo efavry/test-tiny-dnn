@@ -14,8 +14,8 @@ RCFLAGS=-O3 -DCNN_USE_AVX -DCNN_USE_SSE -DDNN_USE_IMAGE_API -pthread -msse3 -mav
 #voir https://github.com/tiny-dnn/tiny-dnn/blob/6ddac1ef3d7ff1594a7ec8c71caa125cc096214f/cmake/summary.cmake chercher LibDNN
 #voir https://github.com/tiny-dnn/tiny-dnn section buildinf
  
-DTARGET=engin_debug
-RTARGET=engin_release
+DTARGET=test_debug
+RTARGET=test_release
 
 SOURCEFILE=main.cpp
 
