@@ -1,7 +1,7 @@
 BASENAME=
 # tyny dnn is not compatble with gcc8+ for now
 # tiny dnn need a compiler with c++14 functionality
-CC=g++-7
+CC=g++
 
 ICC=icl++
 CFLAGS=-Wall -Wextra -fpic -Wpedantic -Wno-narrowing -Wno-deprecated -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs -std=gnu++14 -I.
@@ -30,6 +30,9 @@ release:
 
 debug: 
 	$(CC) $(CFLAGS) $(DCFLAGS) -o ./bin/$(DTARGET) $(SOURCEFILE)
+
+read_test: read_test.cpp
+	$(CC) $(CFLAGS) $(RCFLAGS) -o ./bin/$@ $^
 	
 clean:
 	rm -f ../bin/$(DTARGET)
