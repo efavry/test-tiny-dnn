@@ -241,75 +241,17 @@ static void train(double learning_rate,
 }
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char *argv[]) {
   signal(SIGINT, signalHandler);
   double learning_rate                   = 1;
   int epochs                             = 30;
   int minibatch_size                     = 16;
   tiny_dnn::core::backend_t backend_type = tiny_dnn::core::default_engine();
+  //argument initialization
+  int arg_ret = init(argc, argv, &learning_rate, &epochs,
+                     &minibatch_size, backend_type);
+  if(arg_ret) return arg_ret;
 
-  if (argc == 2)
-  {
-    std::string argname(argv[1]);
-    if (argname == "--help" || argname == "-h")
-    {
-      usage(argv[0]);
-      return 0;
-    }
-  }
-  for (int count = 1; count + 1 < argc; count += 2) {
-    std::string argname(argv[count]);
-    if (argname == "--learning_rate")
-    {
-      learning_rate = atof(argv[count + 1]);
-    }
-    else if (argname == "--epochs")
-    {
-      epochs = atoi(argv[count + 1]);
-    }
-    else if (argname == "--minibatch_size")
-    {
-      minibatch_size = atoi(argv[count + 1]);
-    }
-    else if (argname == "--backend_type")
-    {
-      backend_type = parse_backend_name(argv[count + 1]);
-    }
-    else
-    {
-      std::cerr << "Invalid parameter specified - \"" << argname << "\""
-                << std::endl;
-      usage(argv[0]);
-      return -1;
-    }
-  }
-  if (learning_rate <= 0) {
-    std::cerr
-      << "Invalid learning rate. The learning rate must be greater than 0."
-      << std::endl;
-    return -1;
-  }
-  if (epochs <= 0) {
-    std::cerr << "Invalid number of epochs. The number of epochs must be "
-                 "greater than 0."
-              << std::endl;
-    return -1;
-  }
-  if (minibatch_size <= 0 || minibatch_size > 60000)
-  {
-    std::cerr
-      << "Invalid minibatch size. The minibatch size must be greater than 0"
-         " and less than dataset size (60000)."
-      << std::endl;
-    return -1;
-  }
-  std::cout << "Running with the following parameters:" << std::endl
-            << "Learning rate: " << learning_rate << std::endl
-            << "Minibatch size: " << minibatch_size << std::endl
-            << "Number of epochs: " << epochs << std::endl
-            << "Backend type: " << backend_type << std::endl
-            << std::endl;
   try
   {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();

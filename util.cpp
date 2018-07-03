@@ -2,6 +2,7 @@
 
 #include "tiny_dnn/tiny_dnn.h"
 
+
 static tiny_dnn::core::backend_t parse_backend_name(const std::string &name)
 {
   const std::array<const std::string, 5> names = {{"internal", "nnpack", "libdnn", "avx", "opencl",}};
@@ -56,4 +57,73 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,
      << leaky_relu((float_t)1.0) //epsilon = 1.0 in float_t
      << fc(64, 4, true, backend_type) //engin code is 4 for out but with mnist we need something else
      << elu((size_t)4, (float_t)1.0);  // FC 4 out, activation=elu, alpha = 1.0*/
+}
+
+static int init(int argc, char* argv[],
+                 double *learning_rate, int *epochs,
+                 int *minibatch_size,
+                 tiny_dnn::core::backend_t &backend_type) {
+  if (argc == 2)
+  {
+    std::string argname(argv[1]);
+    if (argname == "--help" || argname == "-h")
+    {
+      usage(argv[0]);
+      return 0;
+    }
+  }
+  for (int count = 1; count + 1 < argc; count += 2) {
+    std::string argname(argv[count]);
+    if (argname == "--learning_rate")
+    {
+      *learning_rate = atof(argv[count + 1]);
+    }
+    else if (argname == "--epochs")
+    {
+      *epochs = atoi(argv[count + 1]);
+    }
+    else if (argname == "--minibatch_size")
+    {
+      *minibatch_size = atoi(argv[count + 1]);
+    }
+    else if (argname == "--backend_type")
+    {
+      backend_type = parse_backend_name(argv[count + 1]);
+    }
+    else
+    {
+      std::cerr << "Invalid parameter specified - \"" << argname << "\""
+                << std::endl;
+      usage(argv[0]);
+      return -1;
+    }
+  }
+  if (*learning_rate <= 0) {
+    std::cerr
+      << "Invalid learning rate. The learning rate must be greater than 0."
+      << std::endl;
+    return -1;
+  }
+  if (*epochs <= 0) {
+    std::cerr << "Invalid number of epochs. The number of epochs must be "
+                 "greater than 0."
+              << std::endl;
+    return -1;
+  }
+  if (*minibatch_size <= 0 || *minibatch_size > 60000)
+  {
+    std::cerr
+      << "Invalid minibatch size. The minibatch size must be greater than 0"
+         " and less than dataset size (60000)."
+      << std::endl;
+    return -1;
+  }
+  std::cout << "Running with the following parameters:" << std::endl
+            << "Learning rate: " << learning_rate << std::endl
+            << "Minibatch size: " << minibatch_size << std::endl
+            << "Number of epochs: " << epochs << std::endl
+            << "Backend type: " << backend_type << std::endl
+            << std::endl;
+  return 0;
+
 }
