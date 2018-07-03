@@ -163,21 +163,6 @@ std::vector<tiny_dnn::vec_t> train_images={{0, 7, 0, 7},
 
 static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,tiny_dnn::core::backend_t backend_type)
 {
-    // connection table [Y.Lecun, 1998 Table.1]
-    #define O true
-    #define X false
-      // clang-format off
-    static const bool tbl[] = {
-        O, X, X, X, O, O, O, X, X, O, O, O, O, X, O, O,
-        O, O, X, X, X, O, O, O, X, X, O, O, O, O, X, O,
-        O, O, O, X, X, X, O, O, O, X, X, O, X, O, O, O,
-        X, O, O, O, X, X, O, O, O, O, X, X, O, X, O, O,
-        X, X, O, O, O, X, X, O, O, O, O, X, O, O, X, O,
-        X, X, X, O, O, O, X, X, O, O, O, O, X, O, O, O
-    };
-    // clang-format on
-    #undef O
-    #undef X
 
   // construct nets
   //
