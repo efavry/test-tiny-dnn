@@ -161,7 +161,8 @@ std::vector<tiny_dnn::vec_t> train_images={{0, 7, 0, 7},
 
 
 
-static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,tiny_dnn::core::backend_t backend_type)
+static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,
+                          tiny_dnn::core::backend_t backend_type)
 {
 
   // construct nets
@@ -175,8 +176,6 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,tiny_dnn::
   using ave_pool = tiny_dnn::layers::ave_pool;
   using tanh = tiny_dnn::activation::tanh;
 
-
-
   using tiny_dnn::core::connection_table;
   using padding = tiny_dnn::padding;
 
@@ -187,13 +186,12 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,tiny_dnn::
      << leaky_relu((float_t)1.0) //epsilon = 1.0 in float_t
      << fc(64, 4, true, backend_type) //engin code is 4 for out but with mnist we need something else
      << elu((size_t)4, (float_t)1.0);  // FC 4 out, activation=elu, alpha = 1.0*/
-
 }
 
 static void train(double learning_rate,
-                        const int n_train_epochs,
-                        const int n_minibatch,
-                        tiny_dnn::core::backend_t backend_type)
+                  const int n_train_epochs,
+                  const int n_minibatch,
+                  tiny_dnn::core::backend_t backend_type)
 {
   // specify loss-function and learning strategy
   tiny_dnn::network<tiny_dnn::sequential> nn;
@@ -214,20 +212,15 @@ static void train(double learning_rate,
              static_cast<tiny_dnn::float_t>(sqrt(n_minibatch) * learning_rate));
 
     int epoch = 1;
+    //
     // create callback
     auto on_enumerate_epoch = [&]()
     {
-        std::cout << std::endl << "Epoch " << epoch << "/" << n_train_epochs << " finished. " << t.elapsed() << "s elapsed." << std::endl;
+        std::cout << std::endl <<
+          "Epoch " << epoch << "/" << n_train_epochs << " finished. " <<
+          t.elapsed() << "s elapsed." << std::endl;
         ++epoch;
-        /*tiny_dnn::result res = nn.test(test_images, test_labels);
-        std::cout << res.num_success << "/" << res.num_total << std::endl;
 
-        disp.restart(train_images.size());
-        t.restart();
-        if(((float)res.num_success)/res.num_total*100 > 99 )
-        {
-            std::cout << "99 or up reached !" << epoch << std::endl; //environ 46
-        }*/
         std::cout << "-" << std::endl;
         disp.restart(train_images.size());
         t.restart();
@@ -258,18 +251,18 @@ static void train(double learning_rate,
   std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
   nn.load("test-model");
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-  std::cout << "Loading time " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()<< " microsecondss.\n";
+  std::cout << "Loading time " << 
+    std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() <<
+    " microsecondss.\n";
 
   std::cout << "Testing inference" << std::endl;
   std::vector<tiny_dnn::vec_t> test_images={{0, 7, 0, 7, 0, 7, 0, 7}};
   start = std::chrono::steady_clock::now();
   nn.predict(test_images); //
   end = std::chrono::steady_clock::now();
-  std::cout << "Loading time " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()<< " microsecondss.\n";
-  // test and show results
-  //auto res = nn.test(test_images, test_labels);
-  //res.print_detail(std::cout);
-  //std::cout << res.num_success << "/" << res.num_total << " and " << ((float)res.num_success)/res.num_total*100  << std::endl;
+  std::cout << "Loading time " <<
+    std::chrono::duration_cast<std::chrono::microseconds>(end-start).count()<<
+    " microsecondss.\n";
 }
 
 static tiny_dnn::core::backend_t parse_backend_name(const std::string &name)
