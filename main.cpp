@@ -12,7 +12,6 @@
 
 #include "tiny_dnn/tiny_dnn.h"
 
-//#define CNN_TASK_SIZE 32
 
 std::vector<tiny_dnn::vec_t> train_labels={{0, 7, 0, 7, 0, 7, 0, 7},
                                            {0, 3, 0, 7, 0, 7, 0, 7},
@@ -86,7 +85,7 @@ std::vector<tiny_dnn::vec_t> train_labels={{0, 7, 0, 7, 0, 7, 0, 7},
                                            {0, 9, 0, 29, 0, 29, 0, 29},
                                            {10, 19, 0, 29, 0, 29, 0, 29},
                                            {20, 29, 0, 29, 0, 29, 0, 29}};
-std::vector<tiny_dnn::vec_t> train_images={{0, 7, 0, 7},
+std::vector<tiny_dnn::vec_t> train_set={{0, 7, 0, 7},
                                            {0, 4, 0, 7},
                                            {3, 7, 0, 7},
                                            {0, 3, 0, 7},
@@ -163,22 +162,6 @@ std::vector<tiny_dnn::vec_t> train_images={{0, 7, 0, 7},
 
 static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,tiny_dnn::core::backend_t backend_type)
 {
-    // connection table [Y.Lecun, 1998 Table.1]
-    #define O true
-    #define X false
-      // clang-format off
-    static const bool tbl[] = {
-        O, X, X, X, O, O, O, X, X, O, O, O, O, X, O, O,
-        O, O, X, X, X, O, O, O, X, X, O, O, O, O, X, O,
-        O, O, O, X, X, X, O, O, O, X, X, O, X, O, O, O,
-        X, O, O, O, X, X, O, O, O, O, X, X, O, X, O, O,
-        X, X, O, O, O, X, X, O, O, O, O, X, O, O, X, O,
-        X, X, X, O, O, O, X, X, O, O, O, O, X, O, O, O
-    };
-    // clang-format on
-    #undef O
-    #undef X
-
   // construct nets
   //
   // C : convolution
@@ -186,21 +169,17 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,tiny_dnn::
   // F : fully connected
   // clang-format off
   using fc = tiny_dnn::layers::fc;//equivalent of dense in keras
-  using conv = tiny_dnn::layers::conv;
-  using ave_pool = tiny_dnn::layers::ave_pool;
-  using tanh = tiny_dnn::activation::tanh;
-
-
 
   using tiny_dnn::core::connection_table;
   using padding = tiny_dnn::padding;
 
+  using tanh = tiny_dnn::activation::tanh;
   using leaky_relu = tiny_dnn::activation::leaky_relu;
   using elu = tiny_dnn::activation::elu;
 
   nn << fc(8, 64, true, backend_type) //8in 64out has bias = true
      << leaky_relu((float_t)1.0) //epsilon = 1.0 in float_t
-     << fc(64, 4, true, backend_type) //engin code is 4 for out but with mnist we need something else
+     << fc(64, 4, true, backend_type) //engin code is 4 for out but wih mnist we need something else
      << elu((size_t)4, (float_t)1.0);  // FC 4 out, activation=elu, alpha = 1.0*/
 
 }
@@ -221,7 +200,7 @@ static void train(double learning_rate,
 
   std::cout << "start training" << std::endl;
 
-  tiny_dnn::progress_display disp(train_images.size());
+  tiny_dnn::progress_display disp(train_set.size());
   tiny_dnn::timer t;
 
   optimizer.alpha *=
@@ -234,17 +213,17 @@ static void train(double learning_rate,
     {
         std::cout << std::endl << "Epoch " << epoch << "/" << n_train_epochs << " finished. " << t.elapsed() << "s elapsed." << std::endl;
         ++epoch;
-        /*tiny_dnn::result res = nn.test(test_images, test_labels);
+        /*tiny_dnn::result res = nn.test(test_set, test_labels);
         std::cout << res.num_success << "/" << res.num_total << std::endl;
 
-        disp.restart(train_images.size());
+        disp.restart(train_set.size());
         t.restart();
         if(((float)res.num_success)/res.num_total*100 > 99 )
         {
             std::cout << "99 or up reached !" << epoch << std::endl; //environ 46
         }*/
         std::cout << "-" << std::endl;
-        disp.restart(train_images.size());
+        disp.restart(train_set.size());
         t.restart();
     };
 
@@ -255,7 +234,7 @@ static void train(double learning_rate,
 
   // training //train_once exists !
   nn.fit<tiny_dnn::mse>(optimizer,
-                          train_images,
+                          train_set,
                           train_labels,
                           n_minibatch,
                           n_train_epochs,
@@ -267,22 +246,22 @@ static void train(double learning_rate,
 
 
   // save network model & trained weights
-  nn.save("test-model");
+  nn.save("test-model"); //nn.save("some filename",tiny_dnn::content_type::weights_and_model,tiny_dnn::file_format::binary);
 
   std::cout << "Testing load" << std::endl;
   std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-  nn.load("test-model");
+  nn.load("test-model"); //nn.load("some filename",tiny_dnn::content_type::weights_and_model,tiny_dnn::file_format::binary);
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
   std::cout << "Loading time " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()<< " microsecondss.\n";
 
   std::cout << "Testing inference" << std::endl;
-  std::vector<tiny_dnn::vec_t> test_images={{0, 7, 0, 7, 0, 7, 0, 7}};
+  std::vector<tiny_dnn::vec_t> test_set={{0, 7, 0, 7, 0, 7, 0, 7}};
   start = std::chrono::steady_clock::now();
-  nn.predict(test_images); //
+  nn.predict(test_set); //
   end = std::chrono::steady_clock::now();
   std::cout << "Loading time " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()<< " microsecondss.\n";
   // test and show results
-  //auto res = nn.test(test_images, test_labels);
+  //auto res = nn.test(test_set, test_labels);
   //res.print_detail(std::cout);
   //std::cout << res.num_success << "/" << res.num_total << " and " << ((float)res.num_success)/res.num_total*100  << std::endl;
 }
@@ -312,7 +291,6 @@ static void usage(const char *argv0)
 void signalHandler( int signum )
 {
    std::cout << "Interrupt signal (" << signum << ") received.\n" << std::endl;
-
    exit(signum);
 }
 
@@ -334,7 +312,8 @@ int main(int argc, char **argv)
       return 0;
     }
   }
-  for (int count = 1; count + 1 < argc; count += 2) {
+  for (int count = 1; count + 1 < argc; count += 2) 
+  {
     std::string argname(argv[count]);
     if (argname == "--learning_rate")
     {
@@ -354,30 +333,25 @@ int main(int argc, char **argv)
     }
     else
     {
-      std::cerr << "Invalid parameter specified - \"" << argname << "\""
-                << std::endl;
+      std::cerr << "Invalid parameter specified - \"" << argname << "\"" << std::endl;
       usage(argv[0]);
       return -1;
     }
   }
-  if (learning_rate <= 0) {
+  if (learning_rate <= 0) 
+  {
     std::cerr
-      << "Invalid learning rate. The learning rate must be greater than 0."
-      << std::endl;
+      << "Invalid learning rate. The learning rate must be greater than 0." << std::endl;
     return -1;
   }
-  if (epochs <= 0) {
-    std::cerr << "Invalid number of epochs. The number of epochs must be "
-                 "greater than 0."
-              << std::endl;
+  if (epochs <= 0) 
+  {
+    std::cerr << "Invalid number of epochs. The number of epochs must be greater than 0." << std::endl;
     return -1;
   }
   if (minibatch_size <= 0 || minibatch_size > 60000)
   {
-    std::cerr
-      << "Invalid minibatch size. The minibatch size must be greater than 0"
-         " and less than dataset size (60000)."
-      << std::endl;
+    std::cerr << "Invalid minibatch size. The minibatch size must be greater than 0 and less than dataset size (60000)." << std::endl;
     return -1;
   }
   std::cout << "Running with the following parameters:" << std::endl
