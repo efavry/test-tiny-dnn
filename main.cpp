@@ -159,6 +159,9 @@ std::vector<tiny_dnn::vec_t> train_set={{0, 7, 0, 7},
                                            {19, 29, 0, 29}};
 
 
+                                           
+//NOTE : vec_t -> typedef std::vector<float_t, aligned_allocator<float_t, 64>> vec_t;
+//NOTE : tensor_t -> typedef std::vector<vec_t> tensor_t;
 
 static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,tiny_dnn::core::backend_t backend_type)
 {
@@ -255,10 +258,17 @@ static void train(double learning_rate,
   std::cout << "Loading time " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()<< " microsecondss.\n";
 
   std::cout << "Testing inference" << std::endl;
-  std::vector<tiny_dnn::vec_t> test_set={{0, 7, 0, 7, 0, 7, 0, 7}};
+  /*std::vector<*/tiny_dnn::vec_t/*>*/ test_set=/*{*/{0, 7, 0, 7, 0, 7, 0, 7}/*}*/;
   start = std::chrono::steady_clock::now();
-  nn.predict(test_set); //
+  tiny_dnn::vec_t result = nn.predict(test_set); //
   end = std::chrono::steady_clock::now();
+  std::cout << "Result of inference test : {";
+  for(float_t f_num : result)
+  {
+       std::cout << f_num;
+       std::cout << "|";
+  }
+  std::cout << "}" << std::endl;
   std::cout << "Loading time " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()<< " microsecondss.\n";
   // test and show results
   //auto res = nn.test(test_set, test_labels);

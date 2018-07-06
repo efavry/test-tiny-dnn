@@ -11,9 +11,12 @@
 
 #include "tiny_dnn/util/util.h"
 
+#include <iostream>
+
 namespace tiny_dnn {
 
 // mean-squared-error loss function for regression
+    //int counter_with_a_long_name=0;
 class mse {
  public:
   static float_t f(const vec_t &y, const vec_t &t) {
@@ -27,6 +30,8 @@ class mse {
 
   static vec_t df(const vec_t &y, const vec_t &t) {
     assert(y.size() == t.size());
+    //++counter_with_a_long_name;
+    //std::cout << "DF" << counter_with_a_long_name << std::endl;
     vec_t d(t.size());
     float_t factor = float_t(2) / static_cast<float_t>(t.size());
 
