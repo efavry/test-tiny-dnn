@@ -2,6 +2,27 @@
 
 #include "tiny_dnn/tiny_dnn.h"
 
+static tiny_dnn::vec_t vec_from_ssv(const std::string &ssv) {
+  tiny_dnn::vec_t vec;
+  std::istringstream streamized_line(ssv);
+  std::string token;
+  while(std::getline(streamized_line, token, ' ')) {
+    vec.push_back(std::stoi(token));
+  }
+  return vec;
+}
+
+static void parse_and_append(std::string &line,
+                             std::vector<tiny_dnn::vec_t> &data_vec,
+                             std::vector<tiny_dnn::vec_t> &label_vec) {
+  std::istringstream streamized_line(line);
+  std::string data, label;
+  std::getline(streamized_line, data, ':');
+  std::getline(streamized_line, label, ':');
+
+  data_vec.push_back(vec_from_ssv(data));
+  label_vec.push_back(vec_from_ssv(label));
+}
 
 static tiny_dnn::core::backend_t parse_backend_name(const std::string &name)
 {

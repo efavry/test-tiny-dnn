@@ -5,7 +5,7 @@ CC=g++
 
 ICC=icl++
 CFLAGS=-Wall -Wextra -fpic -Wpedantic -Wno-narrowing -Wno-deprecated -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs -std=gnu++14 -I.
-DCFLAGS=-g -Wno-unknown-pragmas -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer
+DCFLAGS=-g -Wno-unknown-pragmas -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer -DDEBUG
 RCFLAGS=-O3 -DCNN_USE_AVX -DCNN_USE_SSE -DDNN_USE_IMAGE_API -pthread -msse3 -mavx -DNDEBUG 
 #I/home/qsm/Documents/GWU/FisrtPaperIsHope/tiny-dnn-master
 #-D CNN_USE_LIBDNN 
