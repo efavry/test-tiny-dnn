@@ -27,10 +27,9 @@ static void train(std::istream &data_stream,
 
   construct_net(nn, backend_type);
 
-  std::cout << "load models..." << std::endl;
-
-
-  std::cout << "start training" << std::endl;
+#ifdef DEBUG
+  std::cerr << "model constructed..." << std::endl;
+#endif
 
   tiny_dnn::timer t;
 
@@ -40,7 +39,7 @@ static void train(std::istream &data_stream,
 
   int epoch = 1;
 
-  // create callback
+  // create dummy callbacks
   auto on_enumerate_epoch = [&]() { };
   auto on_enumerate_minibatch = [&]() { };
 
@@ -48,7 +47,6 @@ static void train(std::istream &data_stream,
   std::string line;
   std::vector<tiny_dnn::vec_t> data_vec;
   std::vector<tiny_dnn::vec_t> label_vec;
-
   
   std::getline(data_stream, line);
   while(line != "EXIT") {
@@ -65,12 +63,12 @@ static void train(std::istream &data_stream,
         " data point scanned\n";
 
       nn.fit<tiny_dnn::mse>(optimizer,
-                              data_vec,
-                              label_vec,
-                              n_minibatch,
-                              n_train_epochs,
-                              on_enumerate_minibatch,
-                              on_enumerate_epoch);
+                            data_vec,
+                            label_vec,
+                            n_minibatch,
+                            n_train_epochs,
+                            on_enumerate_minibatch,
+                            on_enumerate_epoch);
       data_vec.clear();
       label_vec.clear();
     }
@@ -97,8 +95,6 @@ static void train(std::istream &data_stream,
   data_vec.clear();
   label_vec.clear();
   std::cout << "end training." << std::endl;
-
-
 
   // save network model & trained weights
   nn.save("test-model");
