@@ -2,13 +2,18 @@
 
 #include "tiny_dnn/tiny_dnn.h"
 
-static tiny_dnn::vec_t vec_from_ssv(const std::string &ssv) {
-  tiny_dnn::vec_t vec;
+static void append_to_vec_from_ssv(tiny_dnn::vec_t &vec,
+                                   const std::string &ssv) {
   std::istringstream streamized_line(ssv);
   std::string token;
   while(std::getline(streamized_line, token, ' ')) {
     vec.push_back(std::stoi(token));
   }
+}
+
+static inline tiny_dnn::vec_t vec_from_ssv(const std::string &ssv) {
+  tiny_dnn::vec_t vec;
+  append_to_vec_from_ssv(vec, ssv);
   return vec;
 }
 

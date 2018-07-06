@@ -33,6 +33,9 @@ debug:
 
 read_test: read_test.cpp
 	$(CC) $(CFLAGS) $(RCFLAGS) -o ./bin/$@ $^
+
+predict: predict.cpp
+	$(CC) $(CFLAGS) $(RCFLAGS) -o ./bin/$@ $^
 	
 clean:
 	rm -f ../bin/$(DTARGET)

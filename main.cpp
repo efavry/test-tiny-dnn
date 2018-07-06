@@ -99,22 +99,6 @@ static void train(std::istream &data_stream,
   // save network model & trained weights
   nn.save("test-model");
 
-  std::cout << "Testing load" << std::endl;
-  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-  nn.load("test-model");
-  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-  std::cout << "Loading time " << 
-    std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() <<
-    " microsecondss.\n";
-
-  std::cout << "Testing inference" << std::endl;
-  std::vector<tiny_dnn::vec_t> test_images={{0, 7, 0, 7, 0, 7, 0, 7}};
-  start = std::chrono::steady_clock::now();
-  nn.predict(test_images); //
-  end = std::chrono::steady_clock::now();
-  std::cout << "Loading time " <<
-    std::chrono::duration_cast<std::chrono::microseconds>(end-start).count()<<
-    " microsecondss.\n";
 }
 
 
