@@ -33,7 +33,7 @@ tiny_dnn::vec_t normalize_prediction(tiny_dnn::vec_t &pred,
 
 // allocates and returns a string. Allocation must be freed by the
 // caller
-const char *predict(const char *locdom, const char *whole) {
+char *predict(char *locdom, char *whole) {
 
 
   tiny_dnn::vec_t input_vec;
@@ -75,8 +75,13 @@ const char *predict(const char *locdom, const char *whole) {
 }
 
 // just to test
+// in the end I'd like this to be a library that can be linked together
+// with the application
 int main(int argc, char *argv[]) {
-
-  const char *res = predict("0 31 0 31", "0 63 0 63");
-  printf("%s\n", res);
+  assert(argc==3);
+  char *res = predict(argv[1], argv[2]);
+  char *tok = strtok(res, " ");
+  do {
+    printf("%s\n", tok);
+  } while((tok = strtok (NULL, " ")));
 }
