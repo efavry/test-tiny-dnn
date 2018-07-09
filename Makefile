@@ -1,12 +1,12 @@
 BASENAME=
 # tyny dnn is not compatble with gcc8+ for now
 # tiny dnn need a compiler with c++14 functionality
-CC=g++-7
+CC=g++
 
 ICC=icl++
 CFLAGS=-Wall -Wextra -fpic -Wpedantic -Wno-narrowing -Wno-deprecated -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs -std=gnu++14 -I.
-DCFLAGS=-g -Wno-unknown-pragmas -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer
-RCFLAGS=-O3 -DCNN_USE_AVX -DCNN_USE_SSE -DDNN_USE_IMAGE_API -pthread -msse3 -mavx -DNDEBUG 
+DCFLAGS=-g -Wno-unknown-pragmas -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer -DDEBUG
+RCFLAGS=-O3 -DDNN_USE_IMAGE_API -pthread  -DNDEBUG 
 #I/home/qsm/Documents/GWU/FisrtPaperIsHope/tiny-dnn-master
 #-D CNN_USE_LIBDNN 
 #-fopenmp -D USE_OMP
@@ -30,6 +30,15 @@ release:
 
 debug: 
 	$(CC) $(CFLAGS) $(DCFLAGS) -o ./bin/$(DTARGET) $(SOURCEFILE)
+
+read_test: read_test.cpp
+	$(CC) $(CFLAGS) $(RCFLAGS) -o ./bin/$@ $^
+
+predict: predict.cpp
+	$(CC) $(CFLAGS) $(RCFLAGS) -o ./bin/$@ $^
+
+predict_measure: predict.cpp
+	$(CC) $(CFLAGS) $(RCFLAGS) -DMEASURE -o ./bin/$@ $^
 	
 clean:
 	rm -f ../bin/$(DTARGET)
