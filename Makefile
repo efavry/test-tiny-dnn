@@ -36,6 +36,9 @@ read_test: read_test.cpp
 
 predict: predict.cpp
 	$(CC) $(CFLAGS) $(RCFLAGS) -o ./bin/$@ $^
+
+predict_measure: predict.cpp
+	$(CC) $(CFLAGS) $(RCFLAGS) -DMEASURE -o ./bin/$@ $^
 	
 clean:
 	rm -f ../bin/$(DTARGET)

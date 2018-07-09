@@ -42,27 +42,33 @@ char *predict(char *locdom, char *whole) {
 
   tiny_dnn::vec_t whole_vec = vec_from_ssv(std::string(whole));
 
+#ifdef MEASURE
   std::cout << "Testing load" << std::endl;
   std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+#endif
 
   tiny_dnn::network<tiny_dnn::sequential> nn;
   nn.load("test-model");
 
+
+#ifdef MEASURE
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
   std::cout << "Loading time " << 
     std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() <<
     " microsecondss.\n";
 
-
   std::cout << "Testing inference" << std::endl;
   start = std::chrono::steady_clock::now();
+#endif
 
   tiny_dnn::vec_t prediction = nn.predict(input_vec);
 
+#ifdef MEASURE
   end = std::chrono::steady_clock::now();
   std::cout << "Loading time " <<
     std::chrono::duration_cast<std::chrono::microseconds>(end-start).count()<<
     " microsecondss.\n";
+#endif
 
   char *res = (char *)calloc(100, sizeof(char));
   tiny_dnn::vec_t norm_pred = normalize_prediction(prediction, whole_vec);
@@ -81,7 +87,9 @@ int main(int argc, char *argv[]) {
   assert(argc==3);
   char *res = predict(argv[1], argv[2]);
   char *tok = strtok(res, " ");
+  FILE *pred_file = fopen("prediction", "w");
   do {
-    printf("%s\n", tok);
+    fprintf(pred_file, "%s\n", tok);
   } while((tok = strtok (NULL, " ")));
+  fclose(pred_file);
 }
