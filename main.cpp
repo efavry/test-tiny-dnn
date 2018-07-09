@@ -85,15 +85,23 @@ static void train(std::istream &data_stream,
         std::cout << std::endl;
       }
 #endif
-  nn.fit<tiny_dnn::mse>(optimizer,
-                          data_vec,
-                          label_vec,
-                          n_minibatch,
-                          n_train_epochs,
-                          on_enumerate_minibatch,
-                          on_enumerate_epoch);
-  data_vec.clear();
-  label_vec.clear();
+  // NOTE: currently, because of the way the python framework uses
+  // this executable, this shouldn't happen. but I am still keeping
+  // the logic just in case
+  if(data_vec.size() > 0) {
+    std::cout << "Fit called with " << data_vec.size() <<
+      " data point scanned\n";
+
+    nn.fit<tiny_dnn::mse>(optimizer,
+        data_vec,
+        label_vec,
+        n_minibatch,
+        n_train_epochs,
+        on_enumerate_minibatch,
+        on_enumerate_epoch);
+    data_vec.clear();
+    label_vec.clear();
+  }
   std::cout << "end training." << std::endl;
 
   // save network model & trained weights
