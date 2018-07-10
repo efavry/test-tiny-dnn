@@ -33,7 +33,7 @@ tiny_dnn::vec_t normalize_prediction(tiny_dnn::vec_t &pred,
 
 // allocates and returns a string. Allocation must be freed by the
 // caller
-char *predict(char *locdom, char *whole) {
+char *predict(char *model_path, char *locdom, char *whole) {
 
 
   tiny_dnn::vec_t input_vec;
@@ -48,7 +48,7 @@ char *predict(char *locdom, char *whole) {
 #endif
 
   tiny_dnn::network<tiny_dnn::sequential> nn;
-  nn.load("test-model");
+  nn.load(std::string(model_path)+std::string("/model0"));
 
 #ifdef MEASURE
   auto end = get_time();
@@ -80,9 +80,10 @@ char *predict(char *locdom, char *whole) {
 // just to test
 // in the end I'd like this to be a library that can be linked together
 // with the application
+// arguments : ./predict <model_path> <locdom> <whole>
 int main(int argc, char *argv[]) {
-  assert(argc==3);
-  char *res = predict(argv[1], argv[2]);
+  assert(argc==4);
+  char *res = predict(argv[1], argv[2], argv[3]);
   char *tok = strtok(res, " ");
   FILE *pred_file = fopen("prediction", "w");
   do {
