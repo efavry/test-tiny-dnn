@@ -44,30 +44,27 @@ char *predict(char *locdom, char *whole) {
 
 #ifdef MEASURE
   std::cout << "Testing load" << std::endl;
-  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  auto start = get_time();
 #endif
 
   tiny_dnn::network<tiny_dnn::sequential> nn;
   nn.load("test-model");
 
-
 #ifdef MEASURE
-  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-  std::cout << "Loading time " << 
-    std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() <<
-    " microsecondss.\n";
+  auto end = get_time();
+  std::cout << "Loading time " << diff_time(end, start)  << 
+               " microsecondss.\n";
 
   std::cout << "Testing inference" << std::endl;
-  start = std::chrono::steady_clock::now();
+  start = get_time();
 #endif
 
   tiny_dnn::vec_t prediction = nn.predict(input_vec);
 
 #ifdef MEASURE
-  end = std::chrono::steady_clock::now();
-  std::cout << "Loading time " <<
-    std::chrono::duration_cast<std::chrono::microseconds>(end-start).count()<<
-    " microsecondss.\n";
+  end = get_time();
+  std::cout << "Loading time " << diff_time(end, start) <<
+               " microsecondss.\n";
 #endif
 
   char *res = (char *)calloc(100, sizeof(char));
