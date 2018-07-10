@@ -7,9 +7,9 @@ static inline std::chrono::steady_clock::time_point get_time() {
   return std::chrono::steady_clock::now();
 }
 
-static inline auto time_diff(std::chrono::steady_clock::time_point &t1,
-                             std::chrono::steady_clock::time_point &t2) {
-  return std::chrono::duration_cast<std::chrono::seconds>(t2-t1).count();
+static inline auto time_diff(std::chrono::steady_clock::time_point &end,
+                             std::chrono::steady_clock::time_point &start) {
+  return std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
 }
 
 static void append_to_vec_from_ssv(tiny_dnn::vec_t &vec,
