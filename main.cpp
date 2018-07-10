@@ -103,10 +103,11 @@ static void train(std::istream &data_stream,
     label_vec.clear();
   }
   std::cout << "end training." << std::endl;
+  std::getline(data_stream, line);
+  std::cout << "Saving model : " << line << std::endl;
 
   // save network model & trained weights
-  nn.save("test-model");
-
+  nn.save(line);
 }
 
 
@@ -116,6 +117,7 @@ int main(int argc, char *argv[]) {
   int epochs                             = 30;
   int minibatch_size                     = 16;
   tiny_dnn::core::backend_t backend_type = tiny_dnn::core::default_engine();
+
   //argument initialization
   int arg_ret = init(argc, argv, &learning_rate, &epochs,
                      &minibatch_size, backend_type);
