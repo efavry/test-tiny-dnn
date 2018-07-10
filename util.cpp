@@ -1,6 +1,16 @@
 #include <csignal>
+#include <chrono>
 
 #include "tiny_dnn/tiny_dnn.h"
+
+static inline std::chrono::steady_clock::time_point get_time() {
+  return std::chrono::steady_clock::now();
+}
+
+static inline auto time_diff(std::chrono::steady_clock::time_point &t1,
+                             std::chrono::steady_clock::time_point &t2) {
+  return std::chrono::duration_cast<std::chrono::seconds>(t2-t1).count();
+}
 
 static void append_to_vec_from_ssv(tiny_dnn::vec_t &vec,
                                    const std::string &ssv) {

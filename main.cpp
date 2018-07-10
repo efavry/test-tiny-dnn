@@ -123,10 +123,12 @@ int main(int argc, char *argv[]) {
 
   try
   {
-    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    auto start = get_time();
+
     train(std::cin, learning_rate, epochs, minibatch_size, backend_type);
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::cout << "Time " << std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<< "s.\n";
+
+    auto end = get_time();
+    std::cout << "Time " << time_diff(end, start) << "s.\n";
   }
   catch (tiny_dnn::nn_error &err)
   {
