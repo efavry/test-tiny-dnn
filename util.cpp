@@ -187,7 +187,7 @@ static int init(int argc, char* argv[],
       << std::endl;
     return -1;
   }
-  std::cout << "Running with the following parameters:" << std::endl
+  std::cerr << "Running with the following parameters:" << std::endl
             << "Learning rate: " << *learning_rate << std::endl
             << "Minibatch size: " << *minibatch_size << std::endl
             << "Number of epochs: " << *epochs << std::endl

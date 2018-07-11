@@ -131,13 +131,20 @@ static void train(std::istream &data_stream,
       }
 
 
-      nn.fit<tiny_dnn::mse>(optimizer,
-                            training_data,
-                            training_labels,
-                            n_minibatch,
-                            n_train_epochs,
-                            on_enumerate_minibatch,
-                            on_epoch);
+      try {
+        nn.fit<tiny_dnn::mse>(optimizer,
+                              training_data,
+                              training_labels,
+                              n_minibatch,
+                              n_train_epochs,
+                              on_enumerate_minibatch,
+                              on_epoch);
+      }
+      catch (tiny_dnn::nn_error &err) {
+        std::cerr << "Exception: " << err.what() << std::endl;
+      }
+      
+
       data_vec.clear();
       label_vec.clear();
       epoch = 1;
@@ -161,7 +168,7 @@ static void train(std::istream &data_stream,
   // this executable, this shouldn't happen. but I am still keeping
   // the logic just in case
   if(data_vec.size() > 0) {
-    std::cout << "Fit called with " << data_vec.size() <<
+    std::cout << "Outside Fit called with " << data_vec.size() <<
       " data point scanned\n";
 
     nn.fit<tiny_dnn::mse>(optimizer,
