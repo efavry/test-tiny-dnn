@@ -3,7 +3,7 @@
 path=$1
 
 cp $path /tmp
-cwd=$(cd)
+cwd=$(pwd)
 cd /tmp
 #echo $(pwd)
 filename=$(basename $path)
