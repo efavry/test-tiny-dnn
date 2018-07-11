@@ -7,30 +7,6 @@
 
 #include "util.cpp"
 
-tiny_dnn::vec_t normalize_prediction(tiny_dnn::vec_t &pred,
-                                     tiny_dnn::vec_t &whole) {
-  assert(pred.size() == 4);
-
-  tiny_dnn::vec_t ret;
-
-  ret = { floor(pred[0]),
-          ceil(pred[1]),
-          floor(pred[2]),
-          ceil(pred[3]) };
-
-  ret = { ret[0] >= whole[0] ? ret[0] : (int)whole[0],
-          ret[1] <= whole[1] ? ret[1] : (int)whole[1],
-          ret[2] >= whole[2] ? ret[2] : (int)whole[2],
-          ret[3] <= whole[3] ? ret[3] : (int)whole[3]};
-
-  ret = { ret[0] <= whole[1] ? ret[0] : (int)whole[1],
-          ret[1] >= whole[0] ? ret[1] : (int)whole[0],
-          ret[2] <= whole[3] ? ret[2] : (int)whole[3],
-          ret[3] >= whole[2] ? ret[3] : (int)whole[2]};
-
-  return ret;
-}
-
 // allocates and returns a string. Allocation must be freed by the
 // caller
 char *predict(char *model_path, char *locdom, char *whole) {

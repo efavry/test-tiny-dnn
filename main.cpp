@@ -31,6 +31,7 @@ static void train(std::istream &data_stream,
   std::cerr << "model constructed..." << std::endl;
 #endif
 
+  //tiny_dnn::progress_display disp(48);
   tiny_dnn::timer t;
 
   optimizer.alpha *=
@@ -38,16 +39,58 @@ static void train(std::istream &data_stream,
              static_cast<tiny_dnn::float_t>(sqrt(n_minibatch) * learning_rate));
 
   int epoch = 1;
-
-  // create dummy callbacks
-  auto on_enumerate_epoch = [&]() { };
-  auto on_enumerate_minibatch = [&]() { };
+  int num_batches = 1;
+  // create callback
+  auto on_enumerate_minibatch = [&]()
+  {
+      //disp += n_minibatch;
+  };
 
   // training //train_once exists !
   std::string line;
   std::vector<tiny_dnn::vec_t> data_vec;
   std::vector<tiny_dnn::vec_t> label_vec;
+
+  std::vector<tiny_dnn::vec_t> training_data;
+  std::vector<tiny_dnn::vec_t> training_labels;
   
+  std::vector<tiny_dnn::vec_t> val_data;
+  std::vector<tiny_dnn::vec_t> val_labels;
+
+  std::ofstream log_stream;
+  log_stream.open("training_log");
+
+  //if the learning rate is <1.0 then this metric is meaningless. So
+  //init it to something meaningless
+  double current_accuracy = -1.0;
+
+  auto on_epoch = [&]() {
+    if(learning_rate < 1) {
+      //std::cerr << "Epoch ended" << std::endl;
+      log_stream << std::endl <<
+                   "Batch " << num_batches << "-" <<
+                   "Epoch " << epoch << "/" << n_train_epochs <<
+                   " finished." << std::endl;
+      epoch += 1;
+      size_t total = val_data.size();
+      size_t wrong = 0;
+      for(size_t i = 0 ; i < total ; i++) {
+        tiny_dnn::vec_t res = nn.predict(val_data[i]);
+        tiny_dnn::vec_t whole = get_whole_from_data(val_data[i]);
+        auto norm_res = normalize_prediction(res, whole);
+        for(size_t j = 0 ; j < res.size() ; j++) {
+          if(norm_res[j] != val_labels[i][j]) {
+            wrong += 1;
+            break;
+          }
+        }
+      }
+      current_accuracy = 1.0*(total-wrong)/total;
+      log_stream << "Validation accuracy : " << wrong << "/" << total <<
+                   "=" << current_accuracy << std::endl;
+    }
+  };
+
   std::getline(data_stream, line);
   while(line != "EXIT") {
     if(line == "BATCH") {
@@ -62,18 +105,47 @@ static void train(std::istream &data_stream,
       std::cout << "Fit called with " << data_vec.size() <<
         " data point scanned\n";
 
+      size_t training_size = data_vec.size() * learning_rate;
+      size_t validation_size = data_vec.size() - training_size;
+
+      // sigh.. I miss C arrays
+      // at the very least don't reallocate these
+      // ideally try and see if c++ stl can guarantee contigious storage
+      // and copy some how. I don't ,ind using std::vector.data() and
+      // play with C pointers, at all
+      training_data =
+          std::vector<tiny_dnn::vec_t>(data_vec.begin(), 
+                                       data_vec.begin()+training_size);
+      training_labels =
+          std::vector<tiny_dnn::vec_t>(label_vec.begin(),
+                                       label_vec.begin()+training_size);
+
+      if(learning_rate < 1) {
+        val_data = std::vector<tiny_dnn::vec_t>(data_vec.begin()+
+                                                  training_size+1,
+                                                data_vec.end());
+        val_labels =
+            std::vector<tiny_dnn::vec_t>(label_vec.begin()+
+                                            training_size+1,
+                                         label_vec.end());
+      }
+
+
       nn.fit<tiny_dnn::mse>(optimizer,
-                            data_vec,
-                            label_vec,
+                            training_data,
+                            training_labels,
                             n_minibatch,
                             n_train_epochs,
                             on_enumerate_minibatch,
-                            on_enumerate_epoch);
+                            on_epoch);
       data_vec.clear();
       label_vec.clear();
+      epoch = 1;
+      num_batches += 1;
     }
     else {
       parse_and_append(line, data_vec, label_vec);
+      //std::cout << "Parsed and appended " << line << std::endl;
     }
     std::getline(data_stream, line);
   }
@@ -98,13 +170,15 @@ static void train(std::istream &data_stream,
         n_minibatch,
         n_train_epochs,
         on_enumerate_minibatch,
-        on_enumerate_epoch);
+        on_epoch);
     data_vec.clear();
     label_vec.clear();
   }
   std::cout << "end training." << std::endl;
+  log_stream.close();
   std::getline(data_stream, line);
   std::cout << "Saving model : " << line << std::endl;
+  std::cout << "Final accuracy : " << current_accuracy << std::endl;
 
   // save network model & trained weights
   nn.save(line);

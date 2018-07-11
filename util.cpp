@@ -3,6 +3,39 @@
 
 #include "tiny_dnn/tiny_dnn.h"
 
+tiny_dnn::vec_t get_whole_from_data(const tiny_dnn::vec_t &data) {
+  tiny_dnn::vec_t res;
+  for(size_t i = data.size()/2 ; i < data.size() ; i++) {
+    res.push_back(data[i]);
+  }
+  return res;
+}
+
+
+tiny_dnn::vec_t normalize_prediction(tiny_dnn::vec_t &pred,
+                                     tiny_dnn::vec_t &whole) {
+  assert(pred.size() == 4);
+
+  tiny_dnn::vec_t ret;
+
+  ret = { floor(pred[0]),
+          ceil(pred[1]),
+          floor(pred[2]),
+          ceil(pred[3]) };
+
+  ret = { ret[0] >= whole[0] ? ret[0] : (int)whole[0],
+          ret[1] <= whole[1] ? ret[1] : (int)whole[1],
+          ret[2] >= whole[2] ? ret[2] : (int)whole[2],
+          ret[3] <= whole[3] ? ret[3] : (int)whole[3]};
+
+  ret = { ret[0] <= whole[1] ? ret[0] : (int)whole[1],
+          ret[1] >= whole[0] ? ret[1] : (int)whole[0],
+          ret[2] <= whole[3] ? ret[2] : (int)whole[3],
+          ret[3] >= whole[2] ? ret[3] : (int)whole[2]};
+
+  return ret;
+}
+
 static inline std::chrono::steady_clock::time_point get_time() {
   return std::chrono::steady_clock::now();
 }
@@ -155,9 +188,9 @@ static int init(int argc, char* argv[],
     return -1;
   }
   std::cout << "Running with the following parameters:" << std::endl
-            << "Learning rate: " << learning_rate << std::endl
-            << "Minibatch size: " << minibatch_size << std::endl
-            << "Number of epochs: " << epochs << std::endl
+            << "Learning rate: " << *learning_rate << std::endl
+            << "Minibatch size: " << *minibatch_size << std::endl
+            << "Number of epochs: " << *epochs << std::endl
             << "Backend type: " << backend_type << std::endl
             << std::endl;
   return 0;
