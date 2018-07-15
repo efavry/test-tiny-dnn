@@ -30,7 +30,7 @@ class random_generator {
  private:
   // avoid gen_(0) for MSVC known issue
   // https://connect.microsoft.com/VisualStudio/feedback/details/776456
-  random_generator() : gen_(1) {}
+  random_generator() : gen_(std::chrono::system_clock::now().time_since_epoch().count()) {}
   std::mt19937 gen_;
 };
 

@@ -1,13 +1,63 @@
 #include <csignal>
+#include <chrono>
 
 #include "tiny_dnn/tiny_dnn.h"
+
+tiny_dnn::vec_t get_whole_from_data(const tiny_dnn::vec_t &data) {
+  tiny_dnn::vec_t res;
+  for(size_t i = data.size()/2 ; i < data.size() ; i++) {
+    res.push_back(data[i]);
+  }
+  return res;
+}
+
+
+tiny_dnn::vec_t normalize_prediction(tiny_dnn::vec_t &pred,
+                                     tiny_dnn::vec_t &whole) {
+  assert(pred.size() == 4);
+
+  tiny_dnn::vec_t ret;
+
+  ret = { floor(pred[0]),
+          ceil(pred[1]),
+          floor(pred[2]),
+          ceil(pred[3]) };
+
+  ret = { ret[0] >= whole[0] ? ret[0] : (int)whole[0],
+          ret[1] <= whole[1] ? ret[1] : (int)whole[1],
+          ret[2] >= whole[2] ? ret[2] : (int)whole[2],
+          ret[3] <= whole[3] ? ret[3] : (int)whole[3]};
+
+  ret = { ret[0] <= whole[1] ? ret[0] : (int)whole[1],
+          ret[1] >= whole[0] ? ret[1] : (int)whole[0],
+          ret[2] <= whole[3] ? ret[2] : (int)whole[3],
+          ret[3] >= whole[2] ? ret[3] : (int)whole[2]};
+
+  return ret;
+}
+
+static inline std::chrono::steady_clock::time_point get_time() {
+  return std::chrono::steady_clock::now();
+}
+
+static inline auto time_diff(std::chrono::steady_clock::time_point &end,
+                             std::chrono::steady_clock::time_point &start) {
+  return std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+}
 
 static void append_to_vec_from_ssv(tiny_dnn::vec_t &vec,
                                    const std::string &ssv) {
   std::istringstream streamized_line(ssv);
   std::string token;
-  while(std::getline(streamized_line, token, ' ')) {
-    vec.push_back(std::stoi(token));
+  std::cout << "Line : " << ssv << std::endl;
+  try {
+    while(std::getline(streamized_line, token, ' ')) {
+      std::cout << "Token : " << token << std::endl;
+      vec.push_back(std::stoi(token));
+    }
+  }
+  catch(std::invalid_argument e) {
+    std::cout << "Invalid argument for " << ssv << std::endl;
   }
 }
 
@@ -144,10 +194,10 @@ static int init(int argc, char* argv[],
       << std::endl;
     return -1;
   }
-  std::cout << "Running with the following parameters:" << std::endl
-            << "Learning rate: " << learning_rate << std::endl
-            << "Minibatch size: " << minibatch_size << std::endl
-            << "Number of epochs: " << epochs << std::endl
+  std::cerr << "Running with the following parameters:" << std::endl
+            << "Learning rate: " << *learning_rate << std::endl
+            << "Minibatch size: " << *minibatch_size << std::endl
+            << "Number of epochs: " << *epochs << std::endl
             << "Backend type: " << backend_type << std::endl
             << std::endl;
   return 0;

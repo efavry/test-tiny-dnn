@@ -7,36 +7,16 @@
 
 #include "util.cpp"
 
-tiny_dnn::vec_t normalize_prediction(tiny_dnn::vec_t &pred,
-                                     tiny_dnn::vec_t &whole) {
-  assert(pred.size() == 4);
-
-  tiny_dnn::vec_t ret;
-
-  ret = { floor(pred[0]),
-          ceil(pred[1]),
-          floor(pred[2]),
-          ceil(pred[3]) };
-
-  ret = { ret[0] >= whole[0] ? ret[0] : (int)whole[0],
-          ret[1] <= whole[1] ? ret[1] : (int)whole[1],
-          ret[2] >= whole[2] ? ret[2] : (int)whole[2],
-          ret[3] <= whole[3] ? ret[3] : (int)whole[3]};
-
-  ret = { ret[0] <= whole[1] ? ret[0] : (int)whole[1],
-          ret[1] >= whole[0] ? ret[1] : (int)whole[0],
-          ret[2] <= whole[3] ? ret[2] : (int)whole[3],
-          ret[3] >= whole[2] ? ret[3] : (int)whole[2]};
-
-  return ret;
-}
-
 // allocates and returns a string. Allocation must be freed by the
 // caller
-char *predict(char *locdom, char *whole) {
+char *predict(char *model_path, char *locdom, char *whole) {
 
 
   tiny_dnn::vec_t input_vec;
+  std::cout << "Model path " << model_path << std::endl;
+  std::cout << "locdom " << locdom << std::endl;
+  std::cout << "whole  " << whole << std::endl;
+
   append_to_vec_from_ssv(input_vec, std::string(locdom));
   append_to_vec_from_ssv(input_vec, std::string(whole));
 
@@ -44,30 +24,27 @@ char *predict(char *locdom, char *whole) {
 
 #ifdef MEASURE
   std::cout << "Testing load" << std::endl;
-  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  auto start = get_time();
 #endif
 
   tiny_dnn::network<tiny_dnn::sequential> nn;
-  nn.load("test-model");
-
+  nn.load(std::string(model_path)+std::string("model0"));
 
 #ifdef MEASURE
-  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-  std::cout << "Loading time " << 
-    std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() <<
-    " microsecondss.\n";
+  auto end = get_time();
+  std::cout << "Loading time " << diff_time(end, start)  << 
+               " microsecondss.\n";
 
   std::cout << "Testing inference" << std::endl;
-  start = std::chrono::steady_clock::now();
+  start = get_time();
 #endif
 
   tiny_dnn::vec_t prediction = nn.predict(input_vec);
 
 #ifdef MEASURE
-  end = std::chrono::steady_clock::now();
-  std::cout << "Loading time " <<
-    std::chrono::duration_cast<std::chrono::microseconds>(end-start).count()<<
-    " microsecondss.\n";
+  end = get_time();
+  std::cout << "Loading time " << diff_time(end, start) <<
+               " microsecondss.\n";
 #endif
 
   char *res = (char *)calloc(100, sizeof(char));
@@ -83,10 +60,16 @@ char *predict(char *locdom, char *whole) {
 // just to test
 // in the end I'd like this to be a library that can be linked together
 // with the application
+// arguments : ./predict <model_path> <locdom> <whole>
 int main(int argc, char *argv[]) {
-  assert(argc==3);
-  char *res = predict(argv[1], argv[2]);
+  std::cout << "Application started\n";
+  assert(argc==4);
+  std::cout << "Calling predict\n";
+
+  char *res = predict(argv[1], argv[2], argv[3]);
+  std::cout << "Parsing prediction\n";
   char *tok = strtok(res, " ");
+  std::cout << "Writing to file\n";
   FILE *pred_file = fopen("prediction", "w");
   do {
     fprintf(pred_file, "%s\n", tok);
