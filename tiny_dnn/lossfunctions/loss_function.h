@@ -50,7 +50,7 @@ class logcosh {
     // TODO calculation here
     for(size_t i = 0 ; i < y.size() ; i++) {
       float_t diff = y[i]-t[i];
-      d += diff+log(exp(diff)+1)-log(2.0);
+      d += diff+log(exp(-2*diff)+1)-log(2.0);
     }
     return d/static_cast<float_t>(y.size());
   }
