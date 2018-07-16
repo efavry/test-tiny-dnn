@@ -49,10 +49,10 @@ static void append_to_vec_from_ssv(tiny_dnn::vec_t &vec,
                                    const std::string &ssv) {
   std::istringstream streamized_line(ssv);
   std::string token;
-  std::cout << "Line : " << ssv << std::endl;
+  //std::cout << "Line : " << ssv << std::endl;
   try {
     while(std::getline(streamized_line, token, ' ')) {
-      std::cout << "Token : " << token << std::endl;
+      //std::cout << "Token : " << token << std::endl;
       vec.push_back(std::stoi(token));
     }
   }

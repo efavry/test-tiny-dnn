@@ -132,7 +132,7 @@ static void train(std::istream &data_stream,
 
 
       try {
-        nn.fit<tiny_dnn::mse>(optimizer,
+        nn.fit<tiny_dnn::logcosh>(optimizer,
                               training_data,
                               training_labels,
                               n_minibatch,
@@ -171,7 +171,7 @@ static void train(std::istream &data_stream,
     std::cout << "Outside Fit called with " << data_vec.size() <<
       " data point scanned\n";
 
-    nn.fit<tiny_dnn::mse>(optimizer,
+    nn.fit<tiny_dnn::logcosh>(optimizer,
         data_vec,
         label_vec,
         n_minibatch,

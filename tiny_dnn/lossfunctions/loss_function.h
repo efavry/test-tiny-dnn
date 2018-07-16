@@ -41,6 +41,36 @@ class mse {
   }
 };
 
+class logcosh {
+ public:
+  static float_t f(const vec_t &y, const vec_t &t) {
+    assert(y.size() == t.size());
+    float_t d{0.0};
+
+    // TODO calculation here
+    for(size_t i = 0 ; i < y.size() ; i++) {
+      float_t diff = y[i]-t[i];
+      d += diff+log(exp(diff)+1)-log(2.0);
+    }
+    return d/static_cast<float_t>(y.size());
+  }
+
+  static vec_t df(const vec_t &y, const vec_t &t) {
+    assert(y.size() == t.size());
+
+    vec_t d(t.size());
+    float_t factor = float_t(1) / static_cast<float_t>(t.size());
+
+    for (size_t i = 0; i < y.size(); ++i) {
+      float_t diff = y[i]-t[i];
+      d[i] += diff+log(exp(diff)+1)-log(2.0);
+    }
+
+    return d;
+  }
+};
+
+
 // absolute loss function for regression
 class absolute {
  public:
