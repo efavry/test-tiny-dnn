@@ -10,6 +10,7 @@
 #include <chrono>
 
 #include "tiny_dnn/tiny_dnn.h"
+#include "hyper_rect_ops.hpp"
 
 #include "util.cpp"
 
@@ -67,17 +68,20 @@ static void train(std::istream &data_stream,
   auto on_epoch = [&]() {
     if(learning_rate < 1) {
       //std::cerr << "Epoch ended" << std::endl;
-      log_stream << std::endl <<
+      std::cout << std::endl <<
                    "Batch " << num_batches << "-" <<
                    "Epoch " << epoch << "/" << n_train_epochs <<
                    " finished." << std::endl;
       epoch += 1;
       size_t total = val_data.size();
       size_t wrong = 0;
+      float perf_eff = 0.0, mem_eff = 0.0;
       for(size_t i = 0 ; i < total ; i++) {
         tiny_dnn::vec_t res = nn.predict(val_data[i]);
         tiny_dnn::vec_t whole = get_whole_from_data(val_data[i]);
         auto norm_res = normalize_prediction(res, whole);
+        perf_eff += perf_efficiency(val_labels[i], res);
+        mem_eff += mem_efficiency(val_labels[i], res);
         for(size_t j = 0 ; j < res.size() ; j++) {
           if(norm_res[j] != val_labels[i][j]) {
             wrong += 1;
@@ -86,8 +90,10 @@ static void train(std::istream &data_stream,
         }
       }
       current_accuracy = 1.0*(total-wrong)/total;
-      log_stream << "Validation accuracy : " << wrong << "/" << total <<
+      std::cout << "Validation accuracy : " << wrong << "/" << total <<
                    "=" << current_accuracy << std::endl;
+      std::cout << "\tPerf Efficiency:" << perf_eff/total << std::endl;
+      std::cout << "\tMem  Efficiency:" << mem_eff/total << std::endl;
     }
   };
 
