@@ -80,8 +80,9 @@ static void train(std::istream &data_stream,
         tiny_dnn::vec_t res = nn.predict(val_data[i]);
         tiny_dnn::vec_t whole = get_whole_from_data(val_data[i]);
         auto norm_res = normalize_prediction(res, whole);
-        perf_eff += perf_efficiency(val_labels[i], res);
-        mem_eff += mem_efficiency(val_labels[i], res);
+        perf_eff += perf_efficiency(val_labels[i], norm_res);
+        mem_eff += mem_efficiency(val_labels[i], norm_res);
+        std::cout << "\t\tCalculated mem efficiency " << mem_eff << std::endl;
         for(size_t j = 0 ; j < res.size() ; j++) {
           if(norm_res[j] != val_labels[i][j]) {
             wrong += 1;
@@ -93,7 +94,7 @@ static void train(std::istream &data_stream,
       std::cout << "Validation accuracy : " << wrong << "/" << total <<
                    "=" << current_accuracy << std::endl;
       std::cout << "\tPerf Efficiency:" << perf_eff/total << std::endl;
-      std::cout << "\tMem  Efficiency:" << mem_eff/total << std::endl;
+      std::cout << "\tMem Efficiency:" << mem_eff/total << std::endl;
     }
   };
 
