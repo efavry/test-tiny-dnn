@@ -70,6 +70,80 @@ class logcosh {
   }
 };
 
+class custom {
+ public:
+
+
+  static float_t f(const vec_t &y, const vec_t &t) {
+    assert(y.size() == t.size());
+    float_t d{0.0};
+
+    for(size_t i = 0 ; i < y.size() ; i++) {
+      float_t diff = y[i]-t[i]; // pred is larger -> positive
+      auto val = diff+log(exp(-2*diff)+1)-log(2.0);
+      if(i%2==0) {
+        // this value denotes a lower bound and thus it is desirable to
+        // for this to be smaller. Therefore we shouldn't punish
+        // negative values as much as we punish the positive ones.
+        if(diff < 0) {
+          d += diff+val/tolerance;
+        }
+        else {
+          d += diff+val;
+        }
+      }
+      else {
+        // this value denotes an upper bound and thus it is desirable to
+        // for this to be larger. Therefore we shouldn't punish
+        // positive values as much as we punish the negative ones.
+        if(diff > 0) {
+          d += diff+val/tolerance;
+        }
+        else {
+          d += diff+val;
+        }
+
+      }
+    }
+    return d/static_cast<float_t>(y.size());
+  }
+
+  static vec_t df(const vec_t &y, const vec_t &t) {
+    assert(y.size() == t.size());
+    vec_t d(t.size());
+    for(size_t i = 0 ; i < y.size() ; i++) {
+      float_t diff = y[i]-t[i]; // pred is larger -> positive
+      auto val = diff+log(exp(-2*diff)+1)-log(2.0);
+      if(i%2==0) {
+        // this value denotes a lower bound and thus it is desirable to
+        // for this to be smaller. Therefore we shouldn't punish
+        // negative values as much as we punish the positive ones.
+        if(diff < 0) {
+          d[i] += diff+val/tolerance;
+        }
+        else {
+          d[i] += diff+val;
+        }
+      }
+      else {
+        // this value denotes an upper bound and thus it is desirable to
+        // for this to be larger. Therefore we shouldn't punish
+        // positive values as much as we punish the negative ones.
+        if(diff > 0) {
+          d[i] += diff+val/tolerance;
+        }
+        else {
+          d[i] += diff+val;
+        }
+
+      }
+    }
+
+    return d;
+  }
+ private:
+  static constexpr float_t tolerance{1.1};
+};
 
 // absolute loss function for regression
 class absolute {
