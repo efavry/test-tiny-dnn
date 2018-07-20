@@ -1,7 +1,7 @@
 #!/bin/sh
 
 path=$1
-unpack_path=/home/engin/tmp
+unpack_path=/tmp
 
 cp $path $unpack_path
 cwd=$(pwd)

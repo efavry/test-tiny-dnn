@@ -28,7 +28,7 @@ char *predict(char *model_path, char *locdom, char *whole) {
 #endif
 
   tiny_dnn::network<tiny_dnn::sequential> nn;
-  nn.load(std::string(model_path)+std::string("model0"));
+  nn.load(std::string(model_path)+std::string("modelbest"));
 
 #ifdef MEASURE
   auto end = get_time();
