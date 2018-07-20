@@ -206,6 +206,10 @@ int main(int argc, char *argv[]) {
   int minibatch_size                     = 16;
   tiny_dnn::core::backend_t backend_type = tiny_dnn::core::default_engine();
 
+  auto now = std::chrono::system_clock::now().time_since_epoch();
+  tiny_dnn::set_random_seed(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
+
+
   //argument initialization
   int arg_ret = init(argc, argv, &learning_rate, &epochs,
                      &minibatch_size, backend_type);

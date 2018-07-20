@@ -80,13 +80,13 @@ class custom {
 
     for(size_t i = 0 ; i < y.size() ; i++) {
       float_t diff = y[i]-t[i]; // pred is larger -> positive
-      auto val = diff+log(exp(-2*diff)+1)-log(2.0);
+      auto val = log(cosh(diff));
       if(i%2==0) {
         // this value denotes a lower bound and thus it is desirable to
         // for this to be smaller. Therefore we shouldn't punish
         // negative values as much as we punish the positive ones.
         if(diff < 0) {
-          d += diff+val/tolerance;
+          d += (diff+val)/tolerance;
         }
         else {
           d += diff+val;
@@ -97,7 +97,7 @@ class custom {
         // for this to be larger. Therefore we shouldn't punish
         // positive values as much as we punish the negative ones.
         if(diff > 0) {
-          d += diff+val/tolerance;
+          d += (diff+val)/tolerance;
         }
         else {
           d += diff+val;
@@ -113,13 +113,13 @@ class custom {
     vec_t d(t.size());
     for(size_t i = 0 ; i < y.size() ; i++) {
       float_t diff = y[i]-t[i]; // pred is larger -> positive
-      auto val = diff+log(exp(-2*diff)+1)-log(2.0);
+      auto val = tanh(diff);
       if(i%2==0) {
         // this value denotes a lower bound and thus it is desirable to
         // for this to be smaller. Therefore we shouldn't punish
         // negative values as much as we punish the positive ones.
         if(diff < 0) {
-          d[i] += diff+val/tolerance;
+          d[i] += (diff+val)/tolerance;
         }
         else {
           d[i] += diff+val;
@@ -130,7 +130,7 @@ class custom {
         // for this to be larger. Therefore we shouldn't punish
         // positive values as much as we punish the negative ones.
         if(diff > 0) {
-          d[i] += diff+val/tolerance;
+          d[i] += (diff+val)/tolerance;
         }
         else {
           d[i] += diff+val;
@@ -142,7 +142,7 @@ class custom {
     return d;
   }
  private:
-  static constexpr float_t tolerance{1.1};
+  static constexpr float_t tolerance{2.0};
 };
 
 // absolute loss function for regression
