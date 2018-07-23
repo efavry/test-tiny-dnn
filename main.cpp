@@ -27,6 +27,9 @@ static void train(std::istream &data_stream,
   tiny_dnn::adam optimizer;
 
   construct_net(nn, backend_type);
+  std::ofstream ofs("graph_net_example.txt");
+  tiny_dnn::graph_visualizer viz(nn, "graph");
+  viz.generate(ofs);
 
 #ifdef DEBUG
   std::cerr << "model constructed..." << std::endl;
