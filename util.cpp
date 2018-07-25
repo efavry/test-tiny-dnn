@@ -109,7 +109,8 @@ static void signalHandler( int signum )
 }
 
 static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,
-                          tiny_dnn::core::backend_t backend_type)
+                          tiny_dnn::core::backend_t backend_type,
+                          int in_arr_dim)
 {
 
   // construct nets
@@ -129,9 +130,12 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,
   using leaky_relu = tiny_dnn::activation::leaky_relu;
   using elu = tiny_dnn::activation::elu;
 
-  nn << fc(8, 64, true, backend_type) //8in 64out has bias = true
+  int in_size = in_arr_dim*4;
+  int mid_size = in_size*in_size;
+  int out_size = in_arr_dim*2;
+  nn << fc(in_size, mid_size, true, backend_type) //8in 64out has bias = true
      << leaky_relu((float_t)1.0) //epsilon = 1.0 in float_t
-     << fc(64, 4, true, backend_type) //engin code is 4 for out but with mnist we need something else
+     << fc(mid_size, out_size, true, backend_type) //engin code is 4 for out but with mnist we need something else
      << elu((size_t)4, (float_t)1.0);  // FC 4 out, activation=elu, alpha = 1.0*/
 }
 

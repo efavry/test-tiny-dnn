@@ -26,7 +26,7 @@ static void train(std::istream &data_stream,
   tiny_dnn::network<tiny_dnn::sequential> nn;
   tiny_dnn::adam optimizer;
 
-  construct_net(nn, backend_type);
+  construct_net(nn, backend_type, 2);
   std::ofstream ofs("graph_net_example.txt");
   tiny_dnn::graph_visualizer viz(nn, "graph");
   viz.generate(ofs);
