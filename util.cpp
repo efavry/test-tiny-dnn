@@ -18,20 +18,33 @@ tiny_dnn::vec_t normalize_prediction(tiny_dnn::vec_t &pred,
 
   tiny_dnn::vec_t ret;
 
-  ret = { floor(pred[0]),
-          ceil(pred[1]),
-          floor(pred[2]),
-          ceil(pred[3]) };
+  if(pred.size() == 2) {
+    ret = { floor(pred[0]),
+            ceil(pred[1]) };
 
-  ret = { ret[0] >= whole[0] ? ret[0] : (int)whole[0],
-          ret[1] <= whole[1] ? ret[1] : (int)whole[1],
-          ret[2] >= whole[2] ? ret[2] : (int)whole[2],
-          ret[3] <= whole[3] ? ret[3] : (int)whole[3]};
+    ret = { ret[0] >= whole[0] ? ret[0] : (int)whole[0],
+            ret[1] <= whole[1] ? ret[1] : (int)whole[1] };
 
-  ret = { ret[0] <= whole[1] ? ret[0] : (int)whole[1],
-          ret[1] >= whole[0] ? ret[1] : (int)whole[0],
-          ret[2] <= whole[3] ? ret[2] : (int)whole[3],
-          ret[3] >= whole[2] ? ret[3] : (int)whole[2]};
+    ret = { ret[0] <= whole[1] ? ret[0] : (int)whole[1],
+            ret[1] >= whole[0] ? ret[1] : (int)whole[0] };
+
+  }
+  else if(pred.size() == 4) {
+    ret = { floor(pred[0]),
+            ceil(pred[1]),
+            floor(pred[2]),
+            ceil(pred[3]) };
+
+    ret = { ret[0] >= whole[0] ? ret[0] : (int)whole[0],
+            ret[1] <= whole[1] ? ret[1] : (int)whole[1],
+            ret[2] >= whole[2] ? ret[2] : (int)whole[2],
+            ret[3] <= whole[3] ? ret[3] : (int)whole[3]};
+
+    ret = { ret[0] <= whole[1] ? ret[0] : (int)whole[1],
+            ret[1] >= whole[0] ? ret[1] : (int)whole[0],
+            ret[2] <= whole[3] ? ret[2] : (int)whole[3],
+            ret[3] >= whole[2] ? ret[3] : (int)whole[2]};
+  }
 
   return ret;
 }
@@ -49,7 +62,7 @@ static void append_to_vec_from_ssv(tiny_dnn::vec_t &vec,
                                    const std::string &ssv) {
   std::istringstream streamized_line(ssv);
   std::string token;
-  //std::cout << "Line : " << ssv << std::endl;
+  std::cout << "Line : " << ssv << std::endl;
   try {
     while(std::getline(streamized_line, token, ' ')) {
       //std::cout << "Token : " << token << std::endl;
@@ -136,7 +149,7 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,
   nn << fc(in_size, mid_size, true, backend_type) //8in 64out has bias = true
      << leaky_relu((float_t)1.0) //epsilon = 1.0 in float_t
      << fc(mid_size, out_size, true, backend_type) //engin code is 4 for out but with mnist we need something else
-     << elu((size_t)4, (float_t)1.0);  // FC 4 out, activation=elu, alpha = 1.0*/
+     << elu((size_t)out_size, (float_t)1.0);  // FC 4 out, activation=elu, alpha = 1.0*/
 }
 
 static int init(int argc, char* argv[],
