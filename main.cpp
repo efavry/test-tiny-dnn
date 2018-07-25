@@ -20,13 +20,14 @@ static void train(std::istream &data_stream,
                   double learning_rate,
                   const int n_train_epochs,
                   const int n_minibatch,
+                  const int in_arr_dim,
                   tiny_dnn::core::backend_t backend_type)
 {
   // specify loss-function and learning strategy
   tiny_dnn::network<tiny_dnn::sequential> nn;
   tiny_dnn::adam optimizer;
 
-  construct_net(nn, backend_type, 2);
+  construct_net(nn, backend_type, in_arr_dim);
   std::ofstream ofs("graph_net_example.txt");
   tiny_dnn::graph_visualizer viz(nn, "graph");
   viz.generate(ofs);
@@ -204,9 +205,10 @@ static void train(std::istream &data_stream,
 
 int main(int argc, char *argv[]) {
   signal(SIGINT, signalHandler);
-  double learning_rate                   = 1;
-  int epochs                             = 30;
-  int minibatch_size                     = 16;
+  double learning_rate = 1;
+  int epochs = 30;
+  int minibatch_size = 16;
+  int in_arr_dim = 2;
   tiny_dnn::core::backend_t backend_type = tiny_dnn::core::default_engine();
 
   auto now = std::chrono::system_clock::now().time_since_epoch();
@@ -215,14 +217,15 @@ int main(int argc, char *argv[]) {
 
   //argument initialization
   int arg_ret = init(argc, argv, &learning_rate, &epochs,
-                     &minibatch_size, backend_type);
+                     &minibatch_size, &in_arr_dim, backend_type);
   if(arg_ret) return arg_ret;
 
   try
   {
     auto start = get_time();
 
-    train(std::cin, learning_rate, epochs, minibatch_size, backend_type);
+    train(std::cin, learning_rate, epochs, minibatch_size, in_arr_dim, 
+          backend_type);
 
     auto end = get_time();
     std::cout << "Time " << time_diff(end, start) << "s.\n";

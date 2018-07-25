@@ -141,7 +141,7 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,
 
 static int init(int argc, char* argv[],
                  double *learning_rate, int *epochs,
-                 int *minibatch_size,
+                 int *minibatch_size, int *in_arr_dim,
                  tiny_dnn::core::backend_t &backend_type) {
   if (argc == 2)
   {
@@ -165,6 +165,10 @@ static int init(int argc, char* argv[],
     else if (argname == "--minibatch_size")
     {
       *minibatch_size = atoi(argv[count + 1]);
+    }
+    else if (argname == "--in-arr-dim")
+    {
+      *in_arr_dim = atoi(argv[count + 1]);
     }
     else if (argname == "--backend_type")
     {
