@@ -1,8 +1,11 @@
 #!/bin/sh
 
 path=$1
-unpack_path=/tmp
+locpath=$2
 
+unpack_path=/tmp/$locpath
+
+mkdir -p $unpack_path
 cp $path $unpack_path
 cwd=$(pwd)
 cd $unpack_path
