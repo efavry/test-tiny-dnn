@@ -28,7 +28,7 @@ char *predict(char *model_path, char *locdom, char *whole) {
 #endif
 
   tiny_dnn::network<tiny_dnn::sequential> nn;
-  nn.load(std::string(model_path)+std::string("modelbest"));
+  nn.load(std::string(model_path));
 
 #ifdef MEASURE
   auto end = get_time();
@@ -62,14 +62,14 @@ char *predict(char *model_path, char *locdom, char *whole) {
 // with the application
 // arguments : ./predict <model_path> <locdom> <whole>
 int main(int argc, char *argv[]) {
-  std::cout << "Application started\n";
+  //std::cout << "Application started\n";
   assert(argc==4);
-  std::cout << "Calling predict\n";
+  //std::cout << "Calling predict\n";
 
   char *res = predict(argv[1], argv[2], argv[3]);
-  std::cout << "Parsing prediction\n";
+  //std::cout << "Parsing prediction\n";
   char *tok = strtok(res, " ");
-  std::cout << "Writing to file\n";
+  //std::cout << "Writing to file\n";
   FILE *pred_file = fopen("prediction", "w");
   do {
     fprintf(pred_file, "%s\n", tok);
