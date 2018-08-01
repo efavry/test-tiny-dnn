@@ -105,61 +105,63 @@ static void train(std::istream &data_stream,
   std::getline(data_stream, line);
   while(line != "EXIT") {
     if(line == "BATCH") {
+      if((size_t)(data_vec.size()*learning_rate) > 0) {
 #ifdef DEBUG
-      for(auto &datapoint: data_vec) {
-        for(auto &data: datapoint) {
-          std::cout << data << " ";
+        for(auto &datapoint: data_vec) {
+          for(auto &data: datapoint) {
+            std::cout << data << " ";
+          }
+          std::cout << std::endl;
         }
-        std::cout << std::endl;
-      }
 #endif
-      std::cout << "Fit called with " << data_vec.size() <<
-        " data point scanned\n";
+        std::cout << "Fit called with " << data_vec.size() <<
+          " data point scanned\n";
 
-      size_t training_size = data_vec.size() * learning_rate;
-      size_t validation_size = data_vec.size() - training_size;
+        size_t training_size = data_vec.size() * learning_rate;
+        size_t validation_size = data_vec.size() - training_size;
 
-      // sigh.. I miss C arrays
-      // at the very least don't reallocate these
-      // ideally try and see if c++ stl can guarantee contigious storage
-      // and copy some how. I don't ,ind using std::vector.data() and
-      // play with C pointers, at all
-      training_data =
+        // sigh.. I miss C arrays
+        // at the very least don't reallocate these
+        // ideally try and see if c++ stl can guarantee contigious storage
+        // and copy some how. I don't ,ind using std::vector.data() and
+        // play with C pointers, at all
+        training_data =
           std::vector<tiny_dnn::vec_t>(data_vec.begin(), 
-                                       data_vec.begin()+training_size);
-      training_labels =
+              data_vec.begin()+training_size);
+        training_labels =
           std::vector<tiny_dnn::vec_t>(label_vec.begin(),
-                                       label_vec.begin()+training_size);
+              label_vec.begin()+training_size);
 
-      if(learning_rate < 1) {
-        val_data = std::vector<tiny_dnn::vec_t>(data_vec.begin()+
-                                                  training_size+1,
-                                                data_vec.end());
-        val_labels =
+        if(learning_rate < 1) {
+          val_data = std::vector<tiny_dnn::vec_t>(data_vec.begin()+
+              training_size+1,
+              data_vec.end());
+          val_labels =
             std::vector<tiny_dnn::vec_t>(label_vec.begin()+
-                                            training_size+1,
-                                         label_vec.end());
-      }
+                training_size+1,
+                label_vec.end());
+        }
 
 
-      try {
-        nn.fit<tiny_dnn::custom>(optimizer,
-                              training_data,
-                              training_labels,
-                              n_minibatch,
-                              n_train_epochs,
-                              on_enumerate_minibatch,
-                              on_epoch);
-      }
-      catch (tiny_dnn::nn_error &err) {
-        std::cerr << "Exception: " << err.what() << std::endl;
-      }
-      
+        try {
+          nn.fit<tiny_dnn::custom>(optimizer,
+              training_data,
+              training_labels,
+              n_minibatch,
+              n_train_epochs,
+              on_enumerate_minibatch,
+              on_epoch);
+        }
+        catch (tiny_dnn::nn_error &err) {
+          std::cerr << "Exception: " << err.what() << std::endl;
+        }
 
-      data_vec.clear();
-      label_vec.clear();
-      epoch = 1;
-      num_batches += 1;
+
+        data_vec.clear();
+        label_vec.clear();
+        epoch = 1;
+        num_batches += 1;
+      }
     }
     else {
       parse_and_append(line, data_vec, label_vec);
