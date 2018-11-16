@@ -5,7 +5,12 @@
 
 tiny_dnn::vec_t get_whole_from_data(const tiny_dnn::vec_t &data) {
   tiny_dnn::vec_t res;
+#ifdef PAIRWISE_TRAINING
+  for(size_t i = data.size()/3*2 ; i < data.size() ; i++) {
+#else
   for(size_t i = data.size()/2 ; i < data.size() ; i++) {
+#endif
+
     res.push_back(data[i]);
   }
   return res;
@@ -62,7 +67,7 @@ static void append_to_vec_from_ssv(tiny_dnn::vec_t &vec,
                                    const std::string &ssv) {
   std::istringstream streamized_line(ssv);
   std::string token;
-  std::cout << "Line : " << ssv << std::endl;
+  //std::cout << "Line : " << ssv << std::endl;
   try {
     while(std::getline(streamized_line, token, ' ')) {
       //std::cout << "Token : " << token << std::endl;
@@ -74,6 +79,12 @@ static void append_to_vec_from_ssv(tiny_dnn::vec_t &vec,
   }
 }
 
+static void print_vector(tiny_dnn::vec_t &vec) {
+  for(auto elem = vec.begin() ; elem < vec.end(); elem++) {
+    std::cout << *elem << " ";
+  }
+  std::cout << std::endl;
+}
 static inline tiny_dnn::vec_t vec_from_ssv(const std::string &ssv) {
   tiny_dnn::vec_t vec;
   append_to_vec_from_ssv(vec, ssv);
@@ -143,7 +154,11 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,
   using leaky_relu = tiny_dnn::activation::leaky_relu;
   using elu = tiny_dnn::activation::elu;
 
+#ifdef PAIRWISE_TRAINING
+  int in_size = in_arr_dim*6;
+#else
   int in_size = in_arr_dim*4;
+#endif
   int out_size = in_arr_dim*2;
   int mid_size = in_size*in_size;
 

@@ -4,7 +4,7 @@ BASENAME=
 CC=g++
 
 ICC=icl++
-CFLAGS=-Wall -Wextra -fpic -Wpedantic -Wno-narrowing -Wno-deprecated -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs -std=gnu++14 -I.
+CFLAGS=-Wall -Wextra -fpic -Wpedantic -Wno-narrowing -Wno-deprecated -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs -std=gnu++14 -I. -DPAIRWISE_TRAINING
 DCFLAGS=-g -Wno-unknown-pragmas -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer -DDEBUG
 RCFLAGS=-O3 -DDNN_USE_IMAGE_API -pthread  -DNDEBUG 
 #I/home/qsm/Documents/GWU/FisrtPaperIsHope/tiny-dnn-master
