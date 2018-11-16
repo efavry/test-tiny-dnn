@@ -144,8 +144,9 @@ static void construct_net(tiny_dnn::network<tiny_dnn::sequential> &nn,
   using elu = tiny_dnn::activation::elu;
 
   int in_size = in_arr_dim*4;
-  int mid_size = in_size*in_size;
   int out_size = in_arr_dim*2;
+  int mid_size = in_size*in_size;
+
   nn << fc(in_size, mid_size, true, backend_type) //8in 64out has bias = true
      << leaky_relu((float_t)1.0) //epsilon = 1.0 in float_t
      << fc(mid_size, out_size, true, backend_type) //engin code is 4 for out but with mnist we need something else
