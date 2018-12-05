@@ -84,8 +84,9 @@ static void train(std::istream &data_stream,
         tiny_dnn::vec_t res = nn.predict(val_data[i]);
         tiny_dnn::vec_t whole = get_whole_from_data(val_data[i]);
         auto norm_res = normalize_prediction(res, whole);
-        print_vector(res);
-        print_vector(whole);
+        //print_vector(res);
+        //print_vector(whole);
+        print_vector(val_labels[i]);
         print_vector(norm_res);
         perf_eff += perf_efficiency(val_labels[i], norm_res);
         mem_eff += mem_efficiency(val_labels[i], norm_res);
@@ -147,6 +148,8 @@ static void train(std::istream &data_stream,
 
 
         try {
+          std::cout << "Fit called with " << data_vec.size() <<
+            " data point scanned\n";
           nn.fit<tiny_dnn::custom>(optimizer,
               training_data,
               training_labels,

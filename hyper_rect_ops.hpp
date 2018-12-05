@@ -43,6 +43,8 @@ static inline float rec_size(const tiny_dnn::vec_t &rec) {
 static inline float perf_efficiency(const tiny_dnn::vec_t &target, 
                                     const tiny_dnn::vec_t &pred) {
   auto target_sz = rec_size(target);
+  if(target_sz == 0) // if target is empty, we have perfect perf eff.
+    return 1;
   auto overlap = find_overlap(target, pred);
   //std::cout << "Perf efficiency of target=" << vec_repr(target) <<
                                  //" pred=" << vec_repr(pred) <<
@@ -53,6 +55,20 @@ static inline float perf_efficiency(const tiny_dnn::vec_t &target,
 static inline float mem_efficiency(const tiny_dnn::vec_t &target,
                                    const tiny_dnn::vec_t &pred) {
   auto pred_sz = rec_size(pred);
+  auto target_sz = rec_size(target);
+
+  if(pred_sz == 0) {
+    if(target_sz == 0) {
+      //We were supposed to predict empty domain and we did
+      return 1;
+    }
+    else {
+      // target size was not zero but we haven't brough anything that we are not
+      // supposed to, so memory efficiency is still 1
+      return 1;
+    }
+  }
+ 
   auto overlap = find_overlap(target, pred);
   return overlap/pred_sz;
 }

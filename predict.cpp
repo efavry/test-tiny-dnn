@@ -9,7 +9,7 @@
 
 // allocates and returns a string. Allocation must be freed by the
 // caller
-char *predict(char *model_path, char *locdom, char *whole) {
+char *predict(char *model_path, char *locdom, char *whole, char *remdom) {
 
 
   tiny_dnn::vec_t input_vec;
@@ -18,6 +18,9 @@ char *predict(char *model_path, char *locdom, char *whole) {
   std::cout << "whole  " << whole << std::endl;
 
   append_to_vec_from_ssv(input_vec, std::string(locdom));
+#ifdef PAIRWISE_TRAINING
+  append_to_vec_from_ssv(input_vec, std::string(remdom));
+#endif
   append_to_vec_from_ssv(input_vec, std::string(whole));
 
   tiny_dnn::vec_t whole_vec = vec_from_ssv(std::string(whole));
@@ -40,6 +43,7 @@ char *predict(char *model_path, char *locdom, char *whole) {
 #endif
 
   tiny_dnn::vec_t prediction = nn.predict(input_vec);
+  print_vector(prediction);
 
 #ifdef MEASURE
   end = get_time();
@@ -63,10 +67,16 @@ char *predict(char *model_path, char *locdom, char *whole) {
 // arguments : ./predict <model_path> <locdom> <whole>
 int main(int argc, char *argv[]) {
   //std::cout << "Application started\n";
+#ifdef PAIRWISE_TRAINING
+  assert(argc==5);
+  char *res = predict(argv[1], argv[2], argv[4], argv[3]);
+#else
   assert(argc==4);
+  char *res = predict(argv[1], argv[2], argv[3]);
+#endif
   //std::cout << "Calling predict\n";
 
-  char *res = predict(argv[1], argv[2], argv[3]);
+
   //std::cout << "Parsing prediction\n";
   char *tok = strtok(res, " ");
   //std::cout << "Writing to file\n";
