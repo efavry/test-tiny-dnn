@@ -9,7 +9,8 @@
 
 // allocates and returns a string. Allocation must be freed by the
 // caller
-char *predict(char *model_path, char *locdom, char *whole, char *remdom) {
+//char *predict(char *model_path, char *locdom, char *whole, char *remdom) {
+char *predict(char *model_path, char *locdom, char *whole) {
 
 
   tiny_dnn::vec_t input_vec;
